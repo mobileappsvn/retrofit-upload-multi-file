@@ -11,6 +11,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import rx.Observable;
 
 /**
  * Created by Robert
@@ -34,6 +35,10 @@ interface Service {
     //@POST("/upload_multi_files/MultiUpload.php")
     @POST("/upload_multi_files/MultiPartUpload.php")
     Call<ResponseBody> uploadMultiFile(@Body RequestBody file);
+
+    @POST("/upload_multi_files/MultiPartUpload.php")
+    Observable<ResponseBody> uploadMultiFiles(@Body RequestBody file);
+
 
     @FormUrlEncoded
     @PUT("/api/register")

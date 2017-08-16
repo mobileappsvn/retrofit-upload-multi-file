@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import java.io.File;
 
+//import io.reactivex.Observable;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -30,18 +31,30 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
-import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.converter.gson.GsonConverterFactory;
+import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
+import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+//import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
+
+public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, CallbackListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     private static final int REQUEST_GALLERY_CODE = 200;
     private static final int READ_REQUEST_CODE = 300;
-    private static final String SERVER_PATH = "http://10.64.1.94/";
+    //private static final String SERVER_PATH = "http://10.64.1.94/";
+    private static final String SERVER_PATH = "http://192.168.1.3/";
+
     private Uri uri;
     private Service uploadService;
     ProgressDialog progressDialog;
+    private CompositeSubscription subscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +76,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             @Override
             public void onClick(View view) {
 
-                uploadMultiFile();
+                //uploadMultiFile();
+                uploadMultiFileWithObservable();
+
             }
         });
 
@@ -76,8 +91,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .baseUrl(SERVER_PATH)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build()
                 .create(Service.class);
+
+        subscription = new CompositeSubscription();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading...");
@@ -174,6 +192,85 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         Log.d(TAG, "Permission has been denied");
     }
 
+    private void uploadMultiFileWithObservable() {
+        progressDialog.show();
+
+        ArrayList<String> filePaths = new ArrayList<>();
+        filePaths.add("storage/emulated/0/DCIM/Camera/IMG_20170802_111432.jpg");
+        filePaths.add("storage/emulated/0/Pictures/WeLoveChat/587c4178e4b0060e66732576_294204376.jpg");
+        filePaths.add("storage/emulated/0/Pictures/WeLoveChat/594a2ea4e4b0d6df9153028d_265511791.jpg");
+
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        builder.setType(MultipartBody.FORM);
+
+        builder.addFormDataPart("user_name", "Robert");
+        builder.addFormDataPart("email", "mobile.apps.pro.vn@gmail.com");
+
+        // Map is used to multipart the file using okhttp3.RequestBody
+        // Multiple Images
+        for (int i = 0; i < filePaths.size(); i++) {
+            File file = new File(filePaths.get(i));
+            builder.addFormDataPart("file[]", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
+        }
+
+        MultipartBody requestBody = builder.build();
+
+
+        Observable<ResponseBody> observable = uploadService.uploadMultiFiles(requestBody);
+
+        /*subscription.add(observable.
+                subscribeOn(Schedulers.io())
+                .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new SubscriberCallback(this, 1983)));*/
+        /*subscription.add(observable.
+                subscribeOn(Schedulers.io())
+                .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new SubscriberCallback(this, 1983) {
+                    @Override
+                    public void onCompleted() {
+                        super.onCompleted();
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        super.onError(e);
+                    }
+
+                    @Override
+                    public void onStart() {
+                        super.onStart();
+                    }
+                }));*/
+        subscription.add(observable.
+                subscribeOn(Schedulers.io())
+                .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<ResponseBody>() {
+                    @Override
+                    public void onCompleted() {
+                        progressDialog.dismiss();
+                        //called on completion
+                        Log.d(TAG, "-->onCompleted");
+                    }
+
+                    @Override
+                    public void onError(final Throwable e) {
+                        //called when error occurs
+                        progressDialog.dismiss();
+                        Log.d(TAG, "-->onError.e=" + e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(final ResponseBody s) {
+                        //progressDialog.dismiss();
+                    }
+                }));
+    }
+
     private void uploadMultiFile() {
         progressDialog.show();
 
@@ -195,7 +292,6 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             builder.addFormDataPart("file[]", file.getName(), RequestBody.create(MediaType.parse("multipart/form-data"), file));
         }
 
-        File file = new File("");
         MultipartBody requestBody = builder.build();
         Call<ResponseBody> call = uploadService.uploadMultiFile(requestBody);
         call.enqueue(new Callback<ResponseBody>() {
@@ -216,6 +312,21 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
             }
         });
 
+
+    }
+
+    @Override
+    public void onSuccess(int code, com.robert.uploadfile.ResponseBody response, int requestCode) {
+
+    }
+
+    @Override
+    public void onFailure(int code, Throwable e) {
+
+    }
+
+    @Override
+    public void onFinish(int requestCode) {
 
     }
 }
