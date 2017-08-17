@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
     private static final int REQUEST_GALLERY_CODE = 200;
     private static final int READ_REQUEST_CODE = 300;
-    //private static final String SERVER_PATH = "http://10.64.1.94/";
-    private static final String SERVER_PATH = "http://192.168.1.3/";
+    private static final String SERVER_PATH = "http://10.64.1.94/";
+    //private static final String SERVER_PATH = "http://192.168.1.3/";
 
     private Uri uri;
     private Service uploadService;
@@ -216,37 +216,45 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
         MultipartBody requestBody = builder.build();
 
 
-        Observable<ResponseBody> observable = uploadService.uploadMultiFiles(requestBody);
+        Observable<UploadResponse> observable = uploadService.uploadMultiFiles(requestBody);
+
+        subscription.add(observable.
+                subscribeOn(Schedulers.io())
+                .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
+                .subscribe(new CustomSubscriber() {
+                    @Override
+                    public void onFinish() {
+                        Log.e(TAG, "--->onFinish 1");
+                        progressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onSuccess(com.robert.uploadfile.ResponseBody response) {
+                        Log.e(TAG, "--->onFinish 2");
+
+                        UploadResponse uploadRespond = (UploadResponse) response;
+                        Log.e(TAG, "--->onFinish 2.code=" + uploadRespond.code + "|onFinish 2.success=" + uploadRespond.success);
+                        //handleInstallCount((InstallCountResponse)response);
+                        progressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onError(Response response) {
+                        progressDialog.dismiss();
+                    }
+
+                    @Override
+                    public void onFailure(Throwable e) {
+                        progressDialog.dismiss();
+                    }
+                }));
 
         /*subscription.add(observable.
                 subscribeOn(Schedulers.io())
                 .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(new SubscriberCallback(this, 1983)));*/
+
         /*subscription.add(observable.
-                subscribeOn(Schedulers.io())
-                .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-                .subscribe(new SubscriberCallback(this, 1983) {
-                    @Override
-                    public void onCompleted() {
-                        super.onCompleted();
-                    }
-
-                    @Override
-                    public void onNext(Object o) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        super.onError(e);
-                    }
-
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                    }
-                }));*/
-        subscription.add(observable.
                 subscribeOn(Schedulers.io())
                 .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<ResponseBody>() {
@@ -268,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     public void onNext(final ResponseBody s) {
                         //progressDialog.dismiss();
                     }
-                }));
+                }));*/
     }
 
     private void uploadMultiFile() {

@@ -37,7 +37,7 @@ interface Service {
     Call<ResponseBody> uploadMultiFile(@Body RequestBody file);
 
     @POST("/upload_multi_files/MultiPartUpload.php")
-    Observable<ResponseBody> uploadMultiFiles(@Body RequestBody file);
+    Observable<UploadResponse> uploadMultiFiles(@Body RequestBody file);
 
 
     @FormUrlEncoded
