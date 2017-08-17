@@ -13,6 +13,10 @@ import android.widget.Button;
 import java.io.File;
 
 //import io.reactivex.Observable;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -34,14 +38,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-//import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, CallbackListener {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
     private Uri uri;
     private Service uploadService;
     ProgressDialog progressDialog;
-    private CompositeSubscription subscription;
+    private Disposable mDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,11 +89,9 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                 .baseUrl(SERVER_PATH)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
                 .create(Service.class);
-
-        subscription = new CompositeSubscription();
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Uploading...");
@@ -218,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
         Observable<UploadResponse> observable = uploadService.uploadMultiFiles(requestBody);
 
-        subscription.add(observable.
+        mDisposable = observable.
                 subscribeOn(Schedulers.io())
                 .delay(0, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
                 .subscribe(new CustomSubscriber() {
@@ -247,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
                     public void onFailure(Throwable e) {
                         progressDialog.dismiss();
                     }
-                }));
+                })
 
         /*subscription.add(observable.
                 subscribeOn(Schedulers.io())

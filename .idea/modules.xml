@@ -5,8 +5,6 @@
       <module fileurl="file://$PROJECT_DIR$/Retrofit-Upload-MultiPart-Demo.iml" filepath="$PROJECT_DIR$/Retrofit-Upload-MultiPart-Demo.iml" />
       <module fileurl="file://$PROJECT_DIR$/UploadFile.iml" filepath="$PROJECT_DIR$/UploadFile.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/retrofit-upload-multi-file.iml" filepath="$PROJECT_DIR$/retrofit-upload-multi-file.iml" />
     </modules>
   </component>
