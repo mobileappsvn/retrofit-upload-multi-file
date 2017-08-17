@@ -14,7 +14,7 @@ import rx.Subscriber;
  * Created by robert on 8/17/17.
  */
 
-public abstract class CustomSubscriber<T extends ResponseBody> extends Subscriber<T>  implements Callback<T> {
+public abstract class CustomSubscriber<T extends ResponseBody> extends Subscriber<T> {
     private static final String TAG = Subscriber.class.getSimpleName();
 
 
@@ -40,32 +40,6 @@ public abstract class CustomSubscriber<T extends ResponseBody> extends Subscribe
     public void onCompleted() {
         Log.i(TAG, "CustomSubscriber  --------------------> onCompleted");
         onFinish();
-    }
-
-    @Override
-    public void onResponse(Call<T> call, Response<T> response) {
-        Log.i(TAG, "CustomSubscriber  --------------------> onResponse");
-        if (response.isSuccessful()) {
-
-            Log.d(TAG, response.code() + ":" + response.raw().request().url());
-
-            onSuccess(response.body());
-
-        } else {
-
-            try {
-                Log.e(TAG, response.code() + ":" + response.raw().request().url() + " - " + response.errorBody().string());
-            } catch (IOException e) {
-                Log.e(TAG, response.code() + ":" + response.raw().request().url());
-                e.printStackTrace();
-            }
-            onError(response);
-        }
-    }
-
-    @Override
-    public void onFailure(Call<T> call, Throwable t) {
-        onFailure(t);
     }
 
     public abstract void onFinish();
