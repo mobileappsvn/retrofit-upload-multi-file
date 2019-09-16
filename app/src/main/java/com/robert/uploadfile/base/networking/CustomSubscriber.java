@@ -1,15 +1,13 @@
-package com.robert.uploadfile;
+package com.robert.uploadfile.base.networking;
 
 import android.util.Log;
 
+import com.robert.uploadfile.base.response.ResponseBody;
+
 import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 
-import java.io.IOException;
-
-import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.adapter.rxjava2.HttpException;
 
 /**
  * Created by robert on 8/17/17.
@@ -43,12 +41,16 @@ public abstract class CustomSubscriber<T extends ResponseBody> implements Subscr
         onFinish();
     }
 
+    @Override
+    public void onSubscribe(Subscription s) {
+
+    }
 
     public abstract void onFinish();
 
     public abstract void onSuccess(T response);
 
-    public abstract void onError(Response<T> response);
+    public abstract void onFailure(Response<T> response);
 
     public abstract void onFailure(Throwable e);
 }

@@ -1,20 +1,21 @@
-package com.robert.uploadfile;
+package com.robert.uploadfile.base.networking;
 
 import android.util.Log;
+
+import com.robert.uploadfile.base.response.ResponseBody;
 
 import java.io.IOException;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import rx.Subscriber;
 
 /**
  * Created by robert on 8/17/17.
  */
 
 public abstract class CustomCallback<T extends ResponseBody> implements Callback<T> {
-    private static final String TAG = Subscriber.class.getSimpleName();
+    private static final String TAG = CustomCallback.class.getSimpleName();
 
     @Override
     public void onResponse(Call<T> call, Response<T> response) {
@@ -33,7 +34,7 @@ public abstract class CustomCallback<T extends ResponseBody> implements Callback
                 Log.e(TAG, response.code() + ":" + response.raw().request().url());
                 e.printStackTrace();
             }
-            onError(response);
+            onFailure(response);
         }
     }
 
@@ -46,7 +47,7 @@ public abstract class CustomCallback<T extends ResponseBody> implements Callback
 
     public abstract void onSuccess(T response);
 
-    public abstract void onError(Response<T> response);
+    public abstract void onFailure(Response<T> response);
 
     public abstract void onFailure(Throwable e);
 }

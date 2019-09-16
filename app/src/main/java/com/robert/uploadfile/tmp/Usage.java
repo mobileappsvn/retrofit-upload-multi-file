@@ -1,10 +1,10 @@
-package com.projectbox.uploadfile.tmp;
+package com.robert.uploadfile.tmp;
 
 /*public static void main(String[]args){
         String charset="UTF-8";
         File uploadFile1=new File("e:/Test/PIC1.JPG");
         File uploadFile2=new File("e:/Test/PIC2.JPG");
-        String requestURL="http://localhost:8080/FileUploadSpringMVC/uploadFile.do";
+        String requestURL="http://localhost:2011//upload_multi_files/fileUpload.php";
 
         try{
             MultipartUtility multipart=new MultipartUtility(requestURL,charset);

@@ -1,0 +1,23 @@
+API Service
+
+@POST("trip/{tripId}/media/photos")
+Call<MediaPost> postEventPhoto(
+        @Path("eventId") int tripId,
+        @Header("Authorization") String accessToken,
+        @Query("direction") String direction,
+        @Body RequestBody photo);
+
+Caller
+
+InputStream in = new FileInputStream(new File(media.getPath()));
+byte[] buf;
+buf = new byte[in.available()];
+while (in.read(buf) != -1);
+RequestBody requestBody = RequestBody
+        .create(MediaType.parse("application/octet-stream"), buf);
+Call<MediaPost> mediaPostCall = tripApiService.postTripPhoto(
+        tripId,
+        ((GlobalInfo) getApplicationContext()).getApiAccessToken(),
+        direction,
+        requestBody);
+

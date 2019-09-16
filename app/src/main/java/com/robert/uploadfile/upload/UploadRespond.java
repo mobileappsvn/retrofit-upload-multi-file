@@ -1,13 +1,13 @@
-package com.robert.uploadfile;
+package com.robert.uploadfile.upload;
 
 /**
  * Created by robert on 8/16/17.
  */
 
-public class UploadObject {
+public class UploadRespond {
     private String success;
 
-    public UploadObject(String success) {
+    public UploadRespond(String success) {
         this.success = success;
     }
 

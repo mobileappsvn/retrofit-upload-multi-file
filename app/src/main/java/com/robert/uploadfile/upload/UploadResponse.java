@@ -1,13 +1,14 @@
-package com.robert.uploadfile;
+package com.robert.uploadfile.upload;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.gson.annotations.SerializedName;
+import com.robert.uploadfile.base.response.ResponseBody;
 
 
 /**
- * Created by namIT on 11/29/2016.
+ * Created by Robert on 2017 Aug 17.
  */
 
 public class UploadResponse extends ResponseBody {
@@ -23,15 +24,17 @@ public class UploadResponse extends ResponseBody {
             return new UploadResponse[size];
         }
     };
-    @SerializedName("success")
-    public String success;
+
+    @SerializedName("desc")
+    public String desc;
 
     public UploadResponse() {
     }
 
     protected UploadResponse(Parcel in) {
         super(in);
-        this.success = in.readString();
+        this.code = in.readInt();
+        this.desc = in.readString();
     }
 
     @Override
@@ -42,6 +45,7 @@ public class UploadResponse extends ResponseBody {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         super.writeToParcel(dest, flags);
-        dest.writeString(success);
+        dest.writeInt(code);
+        dest.writeString(desc);
     }
 }
