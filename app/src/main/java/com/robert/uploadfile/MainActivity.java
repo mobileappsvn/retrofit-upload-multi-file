@@ -672,7 +672,7 @@ public class MainActivity extends BaseActivity implements EasyPermissions.Permis
                         //Put all SUM file into JSONObject
                         jSum.put(file.getName(), dataFileMD5EncryptedToString(file));
 
-                        mapSum.put(file.getName(), RequestBody.create(MediaType.parse("text/plain"), FileUtils.dataFileMD5EncryptedToString(file)));
+                        mapSum.put(file.getName(), RequestBody.create(MediaType.parse("text/plain"), dataFileMD5EncryptedToString(file)));
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
